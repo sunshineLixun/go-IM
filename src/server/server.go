@@ -72,7 +72,7 @@ func (server *Server) Handler(conn net.Conn) {
 	select {}
 }
 
-// 广播上线消息
+// BroadCast 广播上线消息
 func (server *Server) BroadCast(user *user.User, msg string) {
 	sendMsg := "[" + user.Addr + "]" + ":" + msg
 
@@ -80,7 +80,7 @@ func (server *Server) BroadCast(user *user.User, msg string) {
 	server.Message <- sendMsg
 }
 
-// goroutine 监听在线用户，当有消息过来时发送给所有用户
+// ListenMessager goroutine 监听在线用户，当有消息过来时发送给所有用户
 func (server *Server) ListenMessager() {
 	for {
 		msg := <-server.Message
