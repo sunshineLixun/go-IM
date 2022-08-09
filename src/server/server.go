@@ -38,7 +38,12 @@ func (server *Server) Start() {
 	}
 
 	// 程序结束前关闭服务
-	defer listener.Close()
+	defer func(listener net.Listener) {
+		err := listener.Close()
+		if err != nil {
+
+		}
+	}(listener)
 
 	go server.ListenMessager()
 
@@ -59,14 +64,14 @@ func (server *Server) Start() {
 func (server *Server) Handler(conn net.Conn) {
 	// fmt.Println("链接成功")
 
-	user := user.NewUser(conn)
+	newUser := user.NewUser(conn)
 
 	// 防止并发读写错误
 	server.mapLock.Lock()
-	server.OnlineMap[user.Name] = user
+	server.OnlineMap[newUser.Name] = newUser
 	server.mapLock.Unlock()
 
-	server.BroadCast(user, "已上线")
+	server.BroadCast(newUser, "已上线")
 
 	// 阻塞当前handler
 	select {}
@@ -87,8 +92,8 @@ func (server *Server) ListenMessager() {
 
 		server.mapLock.Lock()
 		// 遍历OnlineMap 中搜集的user，向在线的user的channel发消息
-		for _, user := range server.OnlineMap {
-			user.C <- msg
+		for _, u := range server.OnlineMap {
+			u.C <- msg
 		}
 		server.mapLock.Unlock()
 	}

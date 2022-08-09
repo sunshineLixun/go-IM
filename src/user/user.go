@@ -30,7 +30,7 @@ func (user *User) ListenMessage() {
 		// 从go程中获取到上线消息
 		msg := <-user.C
 
-		user.conn.Write([]byte(msg + "\n"))
+		_, _ = user.conn.Write([]byte(msg + "\n"))
 
 	}
 }
